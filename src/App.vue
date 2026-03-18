@@ -1,11 +1,39 @@
+<script setup>
+import { ref } from 'vue';
+
+  const count = ref(0)
+  const target = ref(10)
+  const stitchGuide = ref('')
+
+  const increment = () => {
+    if (count.value < target.value) {
+      count.value++
+    }
+  }
+
+  const frogIt = () => {
+    if (count.value > 0) {
+      count.value--
+    }
+  }
+
+  const reset = () => {
+    count.value = 0
+  }
+
+
+</script>
+
 <template>
-  <div class="flex flex-col items-center justify-center h-screen p-4">
-    <h1 class="text-2xl font-bold">Base app</h1>
-    <p class="text-gray-300 text-center">esta es una base en electron con vue que usaré para mis proyectos y no empezar de 0 siempre</p>
+  <div>
+    <p>Row: {{ count }} / {{ target }}</p>
+
+    
+    <input class="w-full border-1" v-model="stitchGuide" placeholder="Ej: 1sc, 1inc" />
+
+    <button class="btn btn-primary m-1" @click="frogIt">Frog It! (-1)</button>
+    <button class="btn btn-primary m-1" @click="increment">Next (+1)</button>
+    <button class="btn btn-primary m-1" @click="reset">Reset all</button>
     
   </div>
 </template>
-
-<script setup>
-
-</script>
