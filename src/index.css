@@ -1,6 +1,39 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-html, body, #app {
+@theme {
+  --color-base: #4684A9;
+  --color-green: #8EC8BC;
+  --color-light-green: #C1E1C9;
+  --color-pink: #FFAEC9;
+  --color-dark-pink: #E87198;
+}
+
+html {
   background: transparent !important;
+}
+
+body {
+  background: #deffe9e1 !important;
+  -webkit-app-region: drag;
+  width: 100%;
+  height: 100dvh;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  color: #4684A9;
+
+}
+
+#app {
+  background: transparent !important;
+  border-color: #4684A9 !important;
+  border-width: 4px !important;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+button, input, select, textarea, a {
+  -webkit-app-region: no-drag;
 }

@@ -12,9 +12,8 @@ const createWindow = () => {
     width: 350,
     height: 350,
     autoHideMenuBar: true,
-    resizable: false,
-    // poner transparente
-    // backgroundColor: '#00000000',
+    transparent: true,
+    frame: false,
     // backgroundMaterial: 'acrylic',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),

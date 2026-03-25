@@ -11,7 +11,7 @@ import { ref } from 'vue';
     }
   }
 
-  const frogIt = () => {
+  const decrement = () => {
     if (count.value > 0) {
       count.value--
     }
@@ -25,15 +25,16 @@ import { ref } from 'vue';
 </script>
 
 <template>
-  <div>
-    <p>Row: {{ count }} / {{ target }}</p>
-
-    
-    <input class="w-full border-1" v-model="stitchGuide" placeholder="Ej: 1sc, 1inc" />
-
-    <button class="btn btn-primary m-1" @click="frogIt">Frog It! (-1)</button>
-    <button class="btn btn-primary m-1" @click="increment">Next (+1)</button>
-    <button class="btn btn-primary m-1" @click="reset">Reset all</button>
+  <div class="grid grid-rows-[40px_1fr]">
+    <header class="bg-base text-light-green h-10">
+      <p class="font-bold text-xl">Frog Counter</p>
+    </header>
+    <main class="flex justify-center items-center">
+      <p class="text-base">{{ count }}</p>
+      <button @click="increment">+</button>
+      <button @click="decrement">-</button>
+      <button @click="reset">Reset</button>
+    </main>
     
   </div>
 </template>
