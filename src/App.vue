@@ -3,7 +3,9 @@ import { ref, onMounted, onUnmounted } from 'vue';
 
 const count = ref(0)
 const target = ref(10)
-const stitchGuide = ref('sc, inc')
+
+
+const stitchGuide = ref('ej: sc, inc')
 
 const plusPressed = ref(false)
 const minusPressed = ref(false)
@@ -35,6 +37,7 @@ const animateButton = (which) => {
 }
 
 const handleKeyDown = (event) => {
+  if (event.target.tagName === 'INPUT') return;
   if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
     increment();
     animateButton('plus');
@@ -65,7 +68,17 @@ onUnmounted(() => {
         <img :class="['transition-transform duration-100 ease-out hover:scale-110 h-20 active:scale-90', { 'scale-90': minusPressed }]" src="./assets/svg/minus.svg" alt="minus-image">
       </button>
       <div class="flex flex-col justify-center items-center bg-light-green w-50 h-50 rounded-4xl border-4 border-base">
-        <p class="text-base font-extrabold text-xl">{{ stitchGuide }}</p>
+
+        <div class="contenedor-patron w-full px-3">
+          <input
+            v-model="stitchGuide"
+            @keyup.enter="$event.target.blur()"
+            placeholder="ej: sc, inc"
+            :class="['input-editable font-extrabold text-lg text-center cursor-pointer bg-transparent border-none outline-none w-full transition-all duration-200 hover:scale-110 hover:rounded-lg hover:px-2 focus:scale-110 focus:rounded-lg focus:px-2 border-2 ',
+              stitchGuide ? 'text-base ' : 'text-base/50 ']"
+          >
+        </div>
+        
         <p class="text-base font-extrabold text-[70px]">
           {{ count }}</p>
         <p class="text-base font-extrabold text-xl">{{count}} / {{target}}</p>
@@ -78,3 +91,9 @@ onUnmounted(() => {
     
   </div>
 </template>
+
+<style scoped>
+.input-editable::placeholder {
+  opacity: 0.4;
+}
+</style>
