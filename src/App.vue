@@ -3,6 +3,10 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import gifStandby from './assets/gifs/standby.gif';
 import gifHappy from './assets/gifs/happy.gif';
 import gifSad from './assets/gifs/sad.gif';
+import popSound from './assets/audio/pop.mp3';
+import bongSound from './assets/audio/bong.mp3';
+
+const playSound = (src) => { new Audio(src).play() }
 
 const count = ref(0)
 const target = ref(10)
@@ -52,6 +56,7 @@ const increment = () => {
   if (count.value < target.value) {
     count.value++
     setFrogState('happy')
+    playSound(popSound)
   }
 }
 
@@ -59,6 +64,7 @@ const decrement = () => {
   if (count.value > 0) {
     count.value--
     setFrogState('sad')
+    playSound(bongSound)
   }
 }
 
