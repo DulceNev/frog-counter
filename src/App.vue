@@ -1,5 +1,8 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import gifStandby from './assets/gifs/standby.gif';
+import gifHappy from './assets/gifs/happy.gif';
+import gifSad from './assets/gifs/sad.gif';
 
 const count = ref(0)
 const target = ref(10)
@@ -7,6 +10,21 @@ const stitchGuide = ref('ej: sc, inc')
 
 const plusPressed = ref(false)
 const minusPressed = ref(false)
+
+const frogState = ref('standby')
+let frogTimer = null
+
+const setFrogState = (state) => {
+  frogState.value = state
+  if (frogTimer) clearTimeout(frogTimer)
+  frogTimer = setTimeout(() => { frogState.value = 'standby' }, 1500)
+}
+
+const frogSrc = computed(() => {
+  if (frogState.value === 'happy') return gifHappy
+  if (frogState.value === 'sad') return gifSad
+  return gifStandby
+})
 
 const showModal = ref(false)
 const tempStitchGuide = ref('')
@@ -19,8 +37,10 @@ const openModal = () => {
 }
 
 const saveModal = () => {
+  const changed = tempStitchGuide.value !== stitchGuide.value || Number(tempTarget.value) !== target.value
   stitchGuide.value = tempStitchGuide.value
   target.value = Number(tempTarget.value)
+  if (changed) count.value = 0
   showModal.value = false
 }
 
@@ -31,12 +51,14 @@ const closeModal = () => {
 const increment = () => {
   if (count.value < target.value) {
     count.value++
+    setFrogState('happy')
   }
 }
 
 const decrement = () => {
   if (count.value > 0) {
     count.value--
+    setFrogState('sad')
   }
 }
 
@@ -115,9 +137,9 @@ onUnmounted(() => {
       </button>
       </div>
 
-      
 
-      <progress class="progress border-3 my-4 p-1 border-base w-72 h-6 rounded-full bg-light-green" :value="count" :max="target"></progress>
+      <img :src="frogSrc" :alt="`gif-${frogState}`" class="h-20 absolute top-57 ">
+      <progress class="progress border-3 my-5 p-1 border-base w-72 h-6 rounded-full bg-light-green" :value="count" :max="target"></progress>
 
 
     </main>
