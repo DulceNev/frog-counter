@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { SquarePen } from '@lucide/vue';
 import gifStandby from './assets/gifs/standby.gif';
 import gifHappy from './assets/gifs/happy.gif';
 import gifSad from './assets/gifs/sad.gif';
@@ -10,7 +11,7 @@ const playSound = (src) => { new Audio(src).play() }
 
 const count = ref(0)
 const target = ref(10)
-const stitchGuide = ref('ej: sc, inc')
+const stitchGuide = ref('sc, inc')
 
 const plusPressed = ref(false)
 const minusPressed = ref(false)
@@ -113,10 +114,7 @@ onUnmounted(() => {
         class="cursor-pointer text-light-green hover:text-white transition-transform duration-100 hover:scale-110 active:scale-90"
         title="Editar patrón y meta"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-        </svg>
+        <SquarePen />
       </button>
     </header>
 
@@ -147,6 +145,9 @@ onUnmounted(() => {
       <img :src="frogSrc" :alt="`gif-${frogState}`" class="h-20 absolute top-57 ">
       <progress class="progress border-3 my-5 p-1 border-base w-72 h-6 rounded-full bg-light-green" :value="count" :max="target"></progress>
 
+      <button>
+        
+      </button>
 
     </main>
 
