@@ -123,7 +123,7 @@ onUnmounted(() => {
     <main class="flex flex-col justify-center items-center">
       
       <div class="flex justify-center items-center">
-        <button class="cursor-pointer z-10 -mr-7" @keyup.down="decrement" @click="decrement">
+        <button class="cursor-pointer z-10 -mr-7" @click="decrement" @focus="$event.target.blur()">
         <img :class="['transition-transform duration-100 ease-out hover:scale-110 h-20 active:scale-90', { 'scale-90': minusPressed }]" src="./assets/svg/minus.svg" alt="minus-image">
       </button>
       <div class="flex flex-col justify-center items-center bg-light-green w-50 h-50 rounded-4xl border-4 border-base">
@@ -138,7 +138,7 @@ onUnmounted(() => {
           {{ count }}</p>
         <p class="text-base font-extrabold text-xl">{{count}} / {{target}}</p>
       </div>
-      <button class="cursor-pointer z-10 -ml-7" @keyup.up="increment" @click="increment">
+      <button class="cursor-pointer z-10 -ml-7" @click="increment" @focus="$event.target.blur()">
         <img :class="['transition-transform duration-100 ease-out hover:scale-110 h-20 active:scale-90', { 'scale-90': plusPressed }]" src="./assets/svg/plus.svg" alt="plus-image">
       </button>
       </div>
