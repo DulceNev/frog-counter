@@ -156,7 +156,7 @@ onUnmounted(() => {
         <CircleQuestionMark />
       </button>
 
-      <button class="cursor-pointer text-dark-pinky transition-transform duration-100 hover:scale-110 active:scale-90 bg-pinky rounded-full p-1 border-2 border-dark-pinky" title="Reiniciar">
+      <button @click="reset" class="cursor-pointer text-dark-pinky transition-transform duration-100 hover:scale-110 active:scale-90 bg-pinky rounded-full p-1 border-2 border-dark-pinky" title="Reiniciar">
         <RefreshCcwDot />
       </button>
 
