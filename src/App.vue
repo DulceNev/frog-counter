@@ -1,11 +1,12 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { SquarePen } from '@lucide/vue';
+import { SquarePen, CircleQuestionMark, RefreshCcwDot,  Info} from '@lucide/vue';
 import gifStandby from './assets/gifs/standby.gif';
 import gifHappy from './assets/gifs/happy.gif';
 import gifSad from './assets/gifs/sad.gif';
-import popSound from './assets/audio/pop.mp3';
+import cartoonJumpSound from './assets/audio/cartoon-jump.mp3';
 import bongSound from './assets/audio/bong.mp3';
+import sparkleSound from './assets/audio/sparkle.mp3';
 
 const playSound = (src) => { new Audio(src).play() }
 
@@ -57,7 +58,11 @@ const increment = () => {
   if (count.value < target.value) {
     count.value++
     setFrogState('happy')
-    playSound(popSound)
+    if (count.value === target.value) {
+      playSound(sparkleSound)
+    } else {
+      playSound(cartoonJumpSound)
+    }
   }
 }
 
@@ -122,32 +127,43 @@ onUnmounted(() => {
       
       <div class="flex justify-center items-center">
         <button class="cursor-pointer z-10 -mr-7" @click="decrement" @focus="$event.target.blur()">
-        <img :class="['transition-transform duration-100 ease-out hover:scale-110 h-20 active:scale-90', { 'scale-90': minusPressed }]" src="./assets/svg/minus.svg" alt="minus-image">
+        <img :class="['transition-transform duration-100 ease-out hover:scale-110 h-18 active:scale-90', { 'scale-90': minusPressed }]" src="./assets/svg/minus.svg" alt="minus-image">
       </button>
-      <div class="flex flex-col justify-center items-center bg-light-green w-50 h-50 rounded-4xl border-4 border-base">
+      <div class="flex flex-col justify-center items-center bg-light-green w-40 h-40 rounded-4xl border-4 border-base">
 
-        <div class="contenedor-patron w-full px-3">
-          <p :class="['font-extrabold text-lg text-center w-full truncate', stitchGuide ? 'text-base' : 'text-base/50']">
-            {{ stitchGuide || 'ej: sc, inc' }}
+        <div class="contenedor-patron w-full flex flex-col justify-center items-center">
+          <p :class="['font-extrabold text-xl text-center w-full truncate', stitchGuide ? 'text-base' : 'text-base/50']">
+            {{ stitchGuide || 'sc, inc' }}
           </p>
+          <p class="text-base font-extrabold text-6xl">
+          {{ count }}</p>
+            <p class="text-base font-extrabold text-xl">{{count}} / {{target}}</p>
         </div>
 
-        <p class="text-base font-extrabold text-[70px]">
-          {{ count }}</p>
-        <p class="text-base font-extrabold text-xl">{{count}} / {{target}}</p>
+        
       </div>
       <button class="cursor-pointer z-10 -ml-7" @click="increment" @focus="$event.target.blur()">
-        <img :class="['transition-transform duration-100 ease-out hover:scale-110 h-20 active:scale-90', { 'scale-90': plusPressed }]" src="./assets/svg/plus.svg" alt="plus-image">
+        <img :class="['transition-transform duration-100 ease-out hover:scale-110 h-18 active:scale-90', { 'scale-90': plusPressed }]" src="./assets/svg/plus.svg" alt="plus-image">
       </button>
       </div>
 
 
-      <img :src="frogSrc" :alt="`gif-${frogState}`" class="h-20 absolute top-57 ">
-      <progress class="progress border-3 my-5 p-1 border-base w-72 h-6 rounded-full bg-light-green" :value="count" :max="target"></progress>
+      <img :src="frogSrc" :alt="`gif-${frogState}`" class="h-20 absolute top-47 ">
+      <progress class="progress border-3 my-5 p-1 border-base w-56 h-6 rounded-full bg-light-green" :value="count" :max="target"></progress>
 
-      <button>
-        
+      <div class="flex gap-2">
+      <button class="cursor-pointer text-dark-pinky transition-transform duration-100 hover:scale-110 active:scale-90 bg-pinky rounded-full p-1 border-2 border-dark-pinky" title="¿Cómo usar?">
+        <CircleQuestionMark />
       </button>
+
+      <button class="cursor-pointer text-dark-pinky transition-transform duration-100 hover:scale-110 active:scale-90 bg-pinky rounded-full p-1 border-2 border-dark-pinky" title="Reiniciar">
+        <RefreshCcwDot />
+      </button>
+
+      <button class="cursor-pointer text-dark-pinky transition-transform duration-100 hover:scale-110 active:scale-90 bg-pinky rounded-full p-1 border-2 border-dark-pinky" title="Información">
+        <Info />
+      </button>
+      </div>
 
     </main>
 
