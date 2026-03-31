@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { SquarePen, CircleQuestionMark, RefreshCcwDot,  Info} from '@lucide/vue';
+import { SquarePen, CircleQuestionMark, RefreshCcwDot,  Info, Minus, X} from '@lucide/vue';
 import gifStandby from './assets/gifs/standby.gif';
 import gifHappy from './assets/gifs/happy.gif';
 import gifSad from './assets/gifs/sad.gif';
@@ -33,6 +33,9 @@ const frogSrc = computed(() => {
 })
 
 const showModal = ref(false)
+const showHelpModal = ref(false)
+const showResetConfirm = ref(false)
+const showInfoModal = ref(false)
 const tempStitchGuide = ref('')
 const tempTarget = ref(10)
 
@@ -89,7 +92,7 @@ const animateButton = (which) => {
 }
 
 const handleKeyDown = (event) => {
-  if (showModal.value) return;
+  if (showModal.value || showHelpModal.value || showResetConfirm.value) return;
   if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
     increment();
     animateButton('plus');
@@ -97,7 +100,7 @@ const handleKeyDown = (event) => {
     decrement();
     animateButton('minus');
   } else if (event.key === 'r' || event.key === 'R') {
-    reset();
+    showResetConfirm.value = true;
   }
 }
 
@@ -113,23 +116,43 @@ onUnmounted(() => {
 <template>
   <div class="grid grid-rows-[40px_1fr] h-full">
     <header class="bg-base text-light-green h-10 flex items-center justify-between px-3">
-      <p class="font-bold text-xl">Frog Counter</p>
+      <p class="font-bold text-xl">Frog</p>
+      <div class="flex gap-2">
+      
+
+      <button
+        @click=""
+        class="cursor-pointer text-light-green hover:text-white transition-transform duration-100 hover:scale-110 active:scale-90"
+        title="Minimizar"
+      >
+        <Minus />
+      </button>
+
+      <button
+        @click=""
+        class="cursor-pointer text-light-green hover:text-white transition-transform duration-100 hover:scale-110 active:scale-90"
+        title="Editar patrón y meta"
+      >
+        <X />
+      </button>
+      </div>
+    </header>
+
+    <main class="flex flex-col justify-center items-center">
+
       <button
         @click="openModal"
-        class="cursor-pointer text-light-green hover:text-white transition-transform duration-100 hover:scale-110 active:scale-90"
+        class="cursor-pointer text-base transition-transform duration-100 hover:scale-110 active:scale-90 absolute top-15 right-5 "
         title="Editar patrón y meta"
       >
         <SquarePen />
       </button>
-    </header>
-
-    <main class="flex flex-col justify-center items-center">
       
       <div class="flex justify-center items-center">
         <button class="cursor-pointer z-10 -mr-7" @click="decrement" @focus="$event.target.blur()">
         <img :class="['transition-transform duration-100 ease-out hover:scale-110 h-18 active:scale-90', { 'scale-90': minusPressed }]" src="./assets/svg/minus.svg" alt="minus-image">
       </button>
-      <div class="flex flex-col justify-center items-center bg-light-green w-40 h-40 rounded-4xl border-4 border-base">
+      <div class="flex flex-col justify-center items-center bg-light-green w-50 h-40 rounded-4xl border-4 border-base">
 
         <div class="contenedor-patron w-full flex flex-col justify-center items-center">
           <p :class="['font-extrabold text-xl text-center w-full truncate', stitchGuide ? 'text-base' : 'text-base/50']">
@@ -152,20 +175,85 @@ onUnmounted(() => {
       <progress class="progress border-3 my-5 p-1 border-base w-56 h-6 rounded-full bg-light-green" :value="count" :max="target"></progress>
 
       <div class="flex gap-2">
-      <button class="cursor-pointer text-dark-pinky transition-transform duration-100 hover:scale-110 active:scale-90 bg-pinky rounded-full p-1 border-2 border-dark-pinky" title="¿Cómo usar?">
+      <button @click="showHelpModal = true" class="cursor-pointer text-dark-pinky transition-transform duration-100 hover:scale-110 active:scale-90 bg-pinky rounded-full p-1 border-2 border-dark-pinky" title="¿Cómo usar?">
         <CircleQuestionMark />
       </button>
 
-      <button @click="reset" class="cursor-pointer text-dark-pinky transition-transform duration-100 hover:scale-110 active:scale-90 bg-pinky rounded-full p-1 border-2 border-dark-pinky" title="Reiniciar">
+      <button @click="showResetConfirm = true" class="cursor-pointer text-dark-pinky transition-transform duration-100 hover:scale-110 active:scale-90 bg-pinky rounded-full p-1 border-2 border-dark-pinky" title="Reiniciar">
         <RefreshCcwDot />
       </button>
 
-      <button class="cursor-pointer text-dark-pinky transition-transform duration-100 hover:scale-110 active:scale-90 bg-pinky rounded-full p-1 border-2 border-dark-pinky" title="Información">
+      <button @click="showInfoModal = true" class="cursor-pointer text-dark-pinky transition-transform duration-100 hover:scale-110 active:scale-90 bg-pinky rounded-full p-1 border-2 border-dark-pinky" title="Información">
         <Info />
       </button>
       </div>
 
     </main>
+
+    <!-- Info Modal -->
+    <Transition name="modal">
+      <div v-if="showInfoModal" class="fixed inset-0 flex items-center justify-center z-50" @click.self="showInfoModal = false">
+        <div class="bg-light-green border-4 border-base rounded-2xl w-72 p-3 shadow-xl flex flex-col gap-4">
+
+          <p class="font-extrabold text-base text-center text-base">¿Por qué "Frog"?</p>
+          <p class="text-sm text-center text-base font-semibold">En el mundo del crochet, cuando cometemos un error y tenemos que deshacer varias vueltas, decimos que estamos haciendo "frogging" esto viene del sonido "rip it, rip it" (deshacerlo), que suena muy parecido al "ribbit, ribbit" de las ranitas</p>
+
+          <button
+            @click="showInfoModal = false"
+            class="cursor-pointer font-bold px-4 py-1 rounded-lg bg-base text-light-green hover:opacity-90 transition-opacity duration-100"
+          >Cerrar</button>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- Reset Confirm Modal -->
+    <Transition name="modal">
+      <div v-if="showResetConfirm" class="fixed inset-0 flex items-center justify-center z-50" @click.self="showResetConfirm = false">
+        <div class="bg-light-green border-4 border-base rounded-2xl w-64 p-5 shadow-xl flex flex-col gap-4">
+          <p class="font-extrabold text-base text-center text-base">¿Reiniciar?</p>
+          <p class="text-sm text-center text-base font-semibold">Se perderá tu progreso actual.</p>
+          <div class="flex gap-3 justify-center">
+            <button
+              @click="showResetConfirm = false"
+              class="cursor-pointer font-bold px-4 py-1 rounded-lg border-2 border-base text-base hover:bg-[#C1E1C9] transition-colors duration-100"
+            >Cancelar</button>
+            <button
+              @click="reset(); showResetConfirm = false"
+              class="cursor-pointer font-bold px-4 py-1 rounded-lg bg-base text-light-green hover:opacity-90 transition-opacity duration-100"
+            >Reiniciar</button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- Help Modal -->
+    <Transition name="modal">
+      <div v-if="showHelpModal" class="fixed inset-0 flex items-center justify-center z-50" @click.self="showHelpModal = false">
+        <div class="bg-light-green border-4 border-base rounded-2xl w-72 p-2 shadow-xl flex flex-col gap-3">
+          <p class="font-extrabold text-lg text-base text-center">¿Cómo usar? _(°︿°)_</p>
+
+          <ul class="flex flex-col gap-2 text-sm text-base font-semibold">
+            <li class="flex gap-2 items-start">
+              <span>Toca el <strong>lápiz</strong> para establecer tu meta de vueltas y el punto del patrón.</span>
+            </li>
+            <li class="flex gap-2 items-start">
+              <span>Usa los botones <strong>➕➖</strong> o las teclas <strong>← →</strong> para avanzar o retroceder.</span>
+            </li>
+            <li class="flex gap-2 items-start">
+              <span>El botón de <strong>reset</strong> o tecla <strong>R</strong> reinicia el conteo a 0.</span>
+            </li>
+            <li class="flex gap-2 items-start">
+              <span>La <strong>barra de progreso</strong> se llena al acercarte a tu meta.</span>
+            </li>
+          </ul>
+
+          <button
+            @click="showHelpModal = false"
+            class="cursor-pointer font-bold px-4 py-1 rounded-lg bg-base text-light-green hover:opacity-90 transition-opacity duration-100 mt-1"
+          >¡Entendido!</button>
+        </div>
+      </div>
+    </Transition>
 
     <!-- Modal -->
     <Transition name="modal">
