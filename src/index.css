@@ -10,13 +10,17 @@
   --color-dark-pinky: #E87198;
 }
 
+:root {
+  --app-bg-alpha: 0.88;
+}
+
 html {
   background: transparent !important;
   font-family: "Nunito", sans-serif;
 }
 
 body {
-  background: #deffe9e1 !important;
+  background: rgba(222, 255, 233, var(--app-bg-alpha)) !important;
   -webkit-app-region: drag;
   width: 100%;
   height: 100dvh;

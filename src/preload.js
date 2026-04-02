@@ -1,2 +1,10 @@
-// Los scripts de precarga contienen el código que se ejecuta en un proceso de renderizado antes de que su contenido web comience a cargar.
-// Estos scripts se ejecutan dentro del contexto del renderizador, pero tienen más privilegios al poder acceder a las APIs de Node.js.
+import { contextBridge, ipcRenderer } from 'electron';
+
+contextBridge.exposeInMainWorld('windowControls', {
+  minimize: () => ipcRenderer.invoke('window:minimize'),
+  close: () => ipcRenderer.invoke('window:close'),
+  getAlwaysOnTop: () => ipcRenderer.invoke('window:get-always-on-top'),
+  toggleAlwaysOnTop: () => ipcRenderer.invoke('window:toggle-always-on-top'),
+  getSizePreset: () => ipcRenderer.invoke('window:get-size-preset'),
+  setSizePreset: (preset) => ipcRenderer.invoke('window:set-size-preset', preset),
+});
