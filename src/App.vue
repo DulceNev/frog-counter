@@ -1,15 +1,13 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { Settings2, SquarePen, CircleQuestionMark, RefreshCcwDot, Info, Minus, Pin, PinOff, X } from '@lucide/vue';
 import gifStandby from './assets/gifs/standby.gif';
 import gifHappy from './assets/gifs/happy.gif';
 import gifSad from './assets/gifs/sad.gif';
 import cartoonJumpSound from './assets/audio/cartoon-jump.mp3';
-import bongSound from './assets/audio/bong.mp3';
+import bongSound from './assets/audio/dragon-studio-frog-croaking-sound-effect-322956.mp3';
 import sparkleSound from './assets/audio/sparkle.mp3';
 import locales from './locales';
-
-const playSound = (src) => { new Audio(src).play() }
 
 const count = ref(0)
 const target = ref(10)
@@ -31,9 +29,14 @@ const windowSizePreset = ref('small')
 const tempStitchGuide = ref('')
 const tempTarget = ref(10)
 const currentLanguage = ref('es')
-const backgroundOpacity = ref(88)
+const backgroundOpacity = ref(80)
+const soundEnabled = ref(true)
 const confettiPieces = ref([])
 let confettiTimer = null
+const COUNTER_STATE_KEY = 'frog-counter-state'
+const audioBufferCache = new Map()
+const audioTrimCache = new Map()
+let audioContext = null
 
 const messages = computed(() => locales[currentLanguage.value] ?? locales.en)
 const t = (key, params = {}) => {
@@ -41,6 +44,98 @@ const t = (key, params = {}) => {
   return Object.entries(params).reduce((result, [paramKey, value]) => {
     return result.replace(`{${paramKey}}`, String(value))
   }, template)
+}
+
+const getAudioContext = () => {
+  if (!audioContext) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext
+    audioContext = new AudioContextClass()
+  }
+
+  return audioContext
+}
+
+const detectTrimRange = (buffer, { firstBurstOnly = false } = {}) => {
+  const channel = buffer.getChannelData(0)
+  const sampleRate = buffer.sampleRate
+  const threshold = 0.02
+  const silenceFrames = Math.max(1, Math.floor(sampleRate * 0.12))
+  let startIndex = 0
+  let endIndex = channel.length - 1
+
+  while (startIndex < channel.length && Math.abs(channel[startIndex]) < threshold) {
+    startIndex += 1
+  }
+
+  while (endIndex > startIndex && Math.abs(channel[endIndex]) < threshold) {
+    endIndex -= 1
+  }
+
+  if (firstBurstOnly) {
+    let silentRun = 0
+    for (let index = startIndex; index <= endIndex; index += 1) {
+      if (Math.abs(channel[index]) < threshold) {
+        silentRun += 1
+        if (silentRun >= silenceFrames) {
+          endIndex = Math.max(startIndex, index - silentRun)
+          break
+        }
+      } else {
+        silentRun = 0
+      }
+    }
+  }
+
+  const padding = Math.floor(sampleRate * 0.015)
+  const start = Math.max(0, (startIndex - padding) / sampleRate)
+  const end = Math.min(buffer.duration, (endIndex + padding) / sampleRate)
+
+  return {
+    start,
+    duration: Math.max(0.08, end - start),
+  }
+}
+
+const loadAudioBuffer = async (src) => {
+  if (!audioBufferCache.has(src)) {
+    const context = getAudioContext()
+    const response = await fetch(src)
+    const arrayBuffer = await response.arrayBuffer()
+    const decodedBuffer = await context.decodeAudioData(arrayBuffer.slice(0))
+    audioBufferCache.set(src, decodedBuffer)
+  }
+
+  return audioBufferCache.get(src)
+}
+
+const getTrimmedAudioSettings = async (src) => {
+  if (!audioTrimCache.has(src)) {
+    const audioBuffer = await loadAudioBuffer(src)
+    const firstBurstOnly = src === bongSound
+    audioTrimCache.set(src, detectTrimRange(audioBuffer, { firstBurstOnly }))
+  }
+
+  return audioTrimCache.get(src)
+}
+
+const playSound = async (src) => {
+  if (!soundEnabled.value) return
+
+  try {
+    const context = getAudioContext()
+    if (context.state === 'suspended') {
+      await context.resume()
+    }
+
+    const audioBuffer = await loadAudioBuffer(src)
+    const { start, duration } = await getTrimmedAudioSettings(src)
+    const source = context.createBufferSource()
+    source.buffer = audioBuffer
+    source.connect(context.destination)
+    source.start(0, start, duration)
+  } catch {
+    new Audio(src).play()
+  }
 }
 
 const setFrogState = (state) => {
@@ -178,6 +273,19 @@ const setBackgroundTransparency = (value) => {
   window.localStorage.setItem('frog-background-opacity', String(backgroundOpacity.value))
 }
 
+const setSoundEnabled = (value) => {
+  soundEnabled.value = value
+  window.localStorage.setItem('frog-sound-enabled', String(value))
+}
+
+const persistCounterState = () => {
+  window.localStorage.setItem(COUNTER_STATE_KEY, JSON.stringify({
+    count: count.value,
+    target: target.value,
+    stitchGuide: stitchGuide.value,
+  }))
+}
+
 const getDefaultLanguage = () => {
   const systemLanguage = window.navigator.language?.split('-')[0]?.toLowerCase()
   return locales[systemLanguage] ? systemLanguage : 'en'
@@ -188,6 +296,8 @@ onMounted(async () => {
 
   const savedLanguage = window.localStorage.getItem('frog-language')
   const savedOpacity = Number(window.localStorage.getItem('frog-background-opacity'))
+  const savedSoundEnabled = window.localStorage.getItem('frog-sound-enabled')
+  const savedCounterState = window.localStorage.getItem(COUNTER_STATE_KEY)
 
   if (savedLanguage && locales[savedLanguage]) {
     currentLanguage.value = savedLanguage
@@ -197,6 +307,27 @@ onMounted(async () => {
 
   if (!Number.isNaN(savedOpacity) && savedOpacity >= 20 && savedOpacity <= 100) {
     backgroundOpacity.value = savedOpacity
+  }
+
+  if (savedSoundEnabled === 'false') {
+    soundEnabled.value = false
+  }
+
+  if (savedCounterState) {
+    try {
+      const parsedState = JSON.parse(savedCounterState)
+      if (typeof parsedState.stitchGuide === 'string') {
+        stitchGuide.value = parsedState.stitchGuide
+      }
+      if (Number.isFinite(parsedState.target) && parsedState.target > 0) {
+        target.value = parsedState.target
+      }
+      if (Number.isFinite(parsedState.count) && parsedState.count >= 0) {
+        count.value = Math.min(parsedState.count, target.value)
+      }
+    } catch {
+      window.localStorage.removeItem(COUNTER_STATE_KEY)
+    }
   }
 
   document.documentElement.style.setProperty('--app-bg-alpha', String(backgroundOpacity.value / 100))
@@ -209,9 +340,14 @@ onMounted(async () => {
   }
 });
 
+watch([count, target, stitchGuide], () => {
+  persistCounterState()
+})
+
 onUnmounted(() => {
   if (frogTimer) clearTimeout(frogTimer)
   if (confettiTimer) clearTimeout(confettiTimer);
+  audioContext?.close?.()
   window.removeEventListener('keydown', handleKeyDown);
 });
 </script>
@@ -238,9 +374,9 @@ onUnmounted(() => {
       />
     </div>
 
-    <header class="bg-base text-light-green h-10 flex items-center justify-between px-3">
+    <header class="window-drag bg-base text-light-green h-10 flex items-center justify-between px-3">
       <p class="font-bold text-xl">{{ t('appName') }}</p>
-      <div class="flex gap-1 items-center">
+      <div class="window-no-drag flex gap-1 items-center">
         <div class="flex items-center gap-1 rounded-full bg-[#ffffff1a] px-1 py-1">
           <button
             v-for="preset in ['small', 'medium', 'large']"
@@ -364,6 +500,19 @@ onUnmounted(() => {
             <p class="text-sm font-semibold text-base/80">{{ t('transparencyValue', { value: backgroundOpacity }) }}</p>
           </div>
 
+          <div class="flex items-center justify-between gap-3">
+            <label class="font-bold text-sm text-base">{{ t('audioLabel') }}</label>
+            <label class="flex items-center gap-3 cursor-pointer">
+              <span class="text-sm font-semibold text-base/80">{{ soundEnabled ? t('audioOn') : t('audioOff') }}</span>
+              <input
+                :checked="soundEnabled"
+                type="checkbox"
+                class="toggle toggle-sm border-base bg-white/70 text-base"
+                @change="setSoundEnabled($event.target.checked)"
+              >
+            </label>
+          </div>
+
           <button
             @click="showSettingsModal = false"
             class="cursor-pointer font-bold px-4 py-1 rounded-lg bg-base text-light-green hover:opacity-90 transition-opacity duration-100"
@@ -481,6 +630,14 @@ onUnmounted(() => {
   background: var(--confetti-color);
   opacity: 0;
   animation: confetti-fall var(--confetti-duration) ease-out var(--confetti-delay) forwards;
+}
+
+.window-drag {
+  -webkit-app-region: drag;
+}
+
+.window-no-drag {
+  -webkit-app-region: no-drag;
 }
 
 .window-button {

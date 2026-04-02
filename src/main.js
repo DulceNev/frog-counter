@@ -111,6 +111,7 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 300,
     height: 300,
+    useContentSize: true,
     minWidth: 300,
     minHeight: 300,
     resizable: false,
