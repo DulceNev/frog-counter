@@ -9,8 +9,8 @@ if (started) {
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 350,
-    height: 350,
+    width: 300,
+    height: 300,
     autoHideMenuBar: true,
     transparent: true,
     frame: false,

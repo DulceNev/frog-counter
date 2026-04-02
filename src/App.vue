@@ -142,49 +142,49 @@ onUnmounted(() => {
 
       <button
         @click="openModal"
-        class="cursor-pointer text-base transition-transform duration-100 hover:scale-110 active:scale-90 absolute top-15 right-5 "
+        class="cursor-pointer text-base transition-transform duration-100 hover:scale-110 active:scale-90 absolute top-13 right-3 "
         title="Editar patrón y meta"
       >
-        <SquarePen />
+        <SquarePen class="w-6"/>
       </button>
       
       <div class="flex justify-center items-center">
         <button class="cursor-pointer z-10 -mr-7" @click="decrement" @focus="$event.target.blur()">
         <img :class="['transition-transform duration-100 ease-out hover:scale-110 h-18 active:scale-90', { 'scale-90': minusPressed }]" src="./assets/svg/minus.svg" alt="minus-image">
       </button>
-      <div class="flex flex-col justify-center items-center bg-light-green w-50 h-40 rounded-4xl border-4 border-base">
+      <div class="flex flex-col justify-center items-center bg-light-green w-40 h-40 rounded-4xl border-3 border-base">
 
         <div class="contenedor-patron w-full flex flex-col justify-center items-center">
-          <p :class="['font-extrabold text-xl text-center w-full truncate', stitchGuide ? 'text-base' : 'text-base/50']">
+          <p :class="['font-extrabold text-md text-center w-full truncate', stitchGuide ? 'text-base' : 'text-base/50']">
             {{ stitchGuide || 'sc, inc' }}
           </p>
           <p class="text-base font-extrabold text-6xl">
           {{ count }}</p>
-            <p class="text-base font-extrabold text-xl">{{count}} / {{target}}</p>
+            <p class="text-base font-extrabold text-md">{{count}} / {{target}}</p>
         </div>
 
         
       </div>
-      <button class="cursor-pointer z-10 -ml-7" @click="increment" @focus="$event.target.blur()">
+      <button class="cursor-pointer z-10 -ml-7 " @click="increment" @focus="$event.target.blur()">
         <img :class="['transition-transform duration-100 ease-out hover:scale-110 h-18 active:scale-90', { 'scale-90': plusPressed }]" src="./assets/svg/plus.svg" alt="plus-image">
       </button>
       </div>
 
 
-      <img :src="frogSrc" :alt="`gif-${frogState}`" class="h-20 absolute top-47 ">
-      <progress class="progress border-3 my-5 p-1 border-base w-56 h-6 rounded-full bg-light-green" :value="count" :max="target"></progress>
+      <img :src="frogSrc" :alt="`gif-${frogState}`" class="h-20 absolute top-43 ">
+      <progress class="progress border-3 mt-5 mb-2 p-1 border-base w-56 h-6 rounded-full bg-green" :value="count" :max="target"></progress>
 
       <div class="flex gap-2">
-      <button @click="showHelpModal = true" class="cursor-pointer text-dark-pinky transition-transform duration-100 hover:scale-110 active:scale-90 bg-pinky rounded-full p-1 border-2 border-dark-pinky" title="¿Cómo usar?">
-        <CircleQuestionMark />
+      <button @click="showHelpModal = true" class="cursor-pointer text-dark-pinky transition-transform duration-100 hover:scale-110 active:scale-90 bg-pinky rounded-full p-0.5 border-2 border-dark-pinky" title="¿Cómo usar?">
+        <CircleQuestionMark class="w-5 h-4"/>
       </button>
 
-      <button @click="showResetConfirm = true" class="cursor-pointer text-dark-pinky transition-transform duration-100 hover:scale-110 active:scale-90 bg-pinky rounded-full p-1 border-2 border-dark-pinky" title="Reiniciar">
-        <RefreshCcwDot />
+      <button @click="showResetConfirm = true" class="cursor-pointer text-dark-pinky transition-transform duration-100 hover:scale-110 active:scale-90 bg-pinky rounded-full p-0.5 border-2 border-dark-pinky" title="Reiniciar">
+        <RefreshCcwDot class="w-5 h-5"/>
       </button>
 
-      <button @click="showInfoModal = true" class="cursor-pointer text-dark-pinky transition-transform duration-100 hover:scale-110 active:scale-90 bg-pinky rounded-full p-1 border-2 border-dark-pinky" title="Información">
-        <Info />
+      <button @click="showInfoModal = true" class="cursor-pointer text-dark-pinky transition-transform duration-100 hover:scale-110 active:scale-90 bg-pinky rounded-full p-0.5 border-2 border-dark-pinky" title="Información">
+        <Info class="w-5 h-4"/>
       </button>
       </div>
 
@@ -303,17 +303,17 @@ progress {
 }
 
 progress::-webkit-progress-bar {
-  background-color: #C1E1C9;
+  background-color: #8EC8BC;
   border-radius: 9999px;
 }
 
 progress::-webkit-progress-value {
-  background-color: #4684A9;
+  background-color: #C1E1C9;
   border-radius: 9999px;
 }
 
 progress::-moz-progress-bar {
-  background-color: #4684A9;
+  background-color: #C1E1C9;
   border-radius: 9999px;
 }
 
